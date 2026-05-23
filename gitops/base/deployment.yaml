@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: go-api
+
+spec:
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: go-api
+
+  template:
+    metadata:
+      labels:
+        app: go-api
+
+    spec:
+      containers:
+        - name: go-api
+          image: go-api:v4
+
+          imagePullPolicy: IfNotPresent
+
+          env:
+            - name: APP_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: go-api-config
+                  key: APP_ENV
+
+            - name: FEATURE_FLAG
+              valueFrom:
+                configMapKeyRef:
+                  name: go-api-config
+                  key: FEATURE_FLAG
+
+            - name: DATABASE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: go-api-secret
+                  key: DATABASE_USER
+
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: go-api-secret
+                  key: DATABASE_PASSWORD
+
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "250m"
+              memory: "256Mi"
+
+          ports:
+            - containerPort: 5001
+
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 5001
+            initialDelaySeconds: 5
+            periodSeconds: 5
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5001
+            initialDelaySeconds: 10
+            periodSeconds: 10

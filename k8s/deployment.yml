@@ -19,9 +19,34 @@ spec:
     spec:
       containers:
         - name: go-api
-          image: go-api:latest
+          image: go-api:v4
 
           imagePullPolicy: IfNotPresent
+
+          env:
+            - name: APP_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: go-api-config
+                  key: APP_ENV
+
+            - name: FEATURE_FLAG
+              valueFrom:
+                configMapKeyRef:
+                  name: go-api-config
+                  key: FEATURE_FLAG
+
+            - name: DATABASE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: go-api-secret
+                  key: DATABASE_USER
+
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: go-api-secret
+                  key: DATABASE_PASSWORD
 
           resources:
             requests:

@@ -20,7 +20,10 @@ func main() {
 
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{
-			"message": "Go API Running",
+			"message":      "Go API Running",
+			"environment":  os.Getenv("APP_ENV"),
+			"feature_flag": os.Getenv("FEATURE_FLAG"),
+			"db_user":      os.Getenv("DATABASE_USER"),
 		})
 	})
 
