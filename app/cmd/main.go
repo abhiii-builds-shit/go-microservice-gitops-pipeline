@@ -4,10 +4,25 @@ import (
 	"os"
 	"time"
 
+	"github.com/gofiber/adaptor/v2"
 	"github.com/gofiber/fiber/v2"
+
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 var ready bool = false
+
+var requestCounter = prometheus.NewCounter(
+	prometheus.CounterOpts{
+		Name: "http_requests_total",
+		Help: "Total Number of HTTP requests",
+	},
+)
+
+func init() {
+	prometheus.MustRegister(requestCounter)
+}
 
 func main() {
 	app := fiber.New()
@@ -19,6 +34,9 @@ func main() {
 	}()
 
 	app.Get("/", func(c *fiber.Ctx) error {
+
+		requestCounter.Inc()
+
 		return c.JSON(fiber.Map{
 			"message":      "Go API Running",
 			"environment":  os.Getenv("APP_ENV"),
@@ -30,6 +48,8 @@ func main() {
 	app.Get("/health", func(c *fiber.Ctx) error {
 		return c.SendStatus(200)
 	})
+
+	app.Get("/metrics", adaptor.HTTPHandler(promhttp.Handler()))
 
 	app.Get("/ready", func(c *fiber.Ctx) error {
 		if !ready {

@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: go-api
-          image: go-api:v4
+          image: go-api:v5
 
           imagePullPolicy: IfNotPresent
 
