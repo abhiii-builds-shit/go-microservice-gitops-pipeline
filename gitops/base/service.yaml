@@ -11,5 +11,7 @@ spec:
     app: go-api
 
   ports:
-    - port: 80
+    - name: http
+      port: 80
       targetPort: 5001
+      nodePort: 30007
